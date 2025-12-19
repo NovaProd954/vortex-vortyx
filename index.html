@@ -20,15 +20,15 @@
     /* THEME VARIABLES (White/Light Theme)    */
     /* -------------------------------------- */
     :root {
-        --bg-color: #f8f9fa;               /* Light Grey Background */
-        --glass-bg: rgba(255, 255, 255, 0.9); /* White Glass */
-        --glass-border: 1px solid rgba(0, 0, 0, 0.08); /* Subtle border */
-        --accent-blue: #2563eb;            /* Stronger Blue for contrast */
+        --bg-color: #f8f9fa;
+        --glass-bg: rgba(255, 255, 255, 0.9);
+        --glass-border: 1px solid rgba(0, 0, 0, 0.08);
+        --accent-blue: #2563eb;
         --accent-hover: #1d4ed8;
-        --text-main: #1f2937;              /* Dark Grey for primary text */
-        --text-muted: #6b7280;             /* Medium Grey for secondary */
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
         --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        --font-display: 'Unbounded', sans-serif; /* For Logo */
+        --font-display: 'Unbounded', sans-serif;
         --shadow-elevation: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
@@ -55,19 +55,18 @@
         position: absolute; top: 20px; left: 20px; z-index: 100;
         display: flex; align-items: center; gap: 12px;
         pointer-events: none;
-        /* Add a backing for readability over map if needed, or rely on text shadow */
         filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); 
     }
     #app-logo-svg {
         width: 38px; height: 38px;
     }
     #app-name {
-        font-family: var(--font-display); /* Unbounded Font applied here */
+        font-family: var(--font-display);
         font-size: 22px; 
         font-weight: 700; 
         letter-spacing: -0.5px;
-        color: #111; /* Very dark grey almost black */
-        text-shadow: 2px 2px 0px #fff; /* White outline effect for readability */
+        color: #111;
+        text-shadow: 2px 2px 0px #fff;
     }
 
     /* Glass Panels (Shared Style) */
@@ -86,6 +85,8 @@
         position: absolute; top: 80px; left: 20px; z-index: 100;
         width: 190px; padding: 10px;
         display: flex; flex-direction: column; gap: 12px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
     }
     .menu-section-title {
         font-size: 11px; text-transform: uppercase; letter-spacing: 1.0px;
@@ -103,15 +104,14 @@
         color: #fff; 
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
-    /* SVG Fill fix for active state */
     .menu-item .menu-item-icon { width: 18px; height: 18px; fill: currentColor; }
     
     /* Top Right Info Panel */
     #info-panel {
         position: absolute; top: 20px; right: 20px; z-index: 100;
         width: 250px; padding: 20px;
-        border-left: 4px solid #f59e0b; /* Warning Orange */
-        background: white; /* Solid white for better readability */
+        border-left: 4px solid #f59e0b;
+        background: white;
     }
     #info-panel h3 { margin: 0 0 4px 0; font-size: 16px; font-weight: 800; color: #111; letter-spacing: -0.5px; font-family: var(--font-display); }
     .issued-text { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
@@ -137,7 +137,7 @@
         position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100;
         display: flex; align-items: center; gap: 15px; padding: 10px 24px;
         border-radius: 30px;
-        background: white; /* Solid white for controls */
+        background: white;
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     }
     .anim-btn {
@@ -158,7 +158,7 @@
         padding: 0 16px;
     }
 
-    /* Map Popups (Light Mode) */
+    /* Map Popups */
     .mapboxgl-popup-content {
         background: #ffffff;
         color: #1f2937;
@@ -167,12 +167,57 @@
         padding: 14px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         font-family: var(--font-stack);
-        min-width: 180px;
+        min-width: 200px;
     }
     .mapboxgl-popup-tip { border-bottom-color: #ffffff !important; }
     .popup-title { color: #f59e0b; font-weight: 800; margin-bottom: 6px; font-size: 13px; border-bottom: 1px solid #eee; padding-bottom: 6px; font-family: var(--font-display); }
     .popup-line { font-size: 12px; margin-bottom: 4px; color: #6b7280; }
     .popup-line strong { color: #111; }
+
+    /* WEATHER MARKER STYLES */
+    .weather-marker {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .weather-marker:hover {
+        transform: scale(1.1);
+        z-index: 1000;
+    }
+    .weather-icon-img {
+        width: 36px;
+        height: 36px;
+        filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+    }
+    .weather-temp-badge {
+        background: #fff;
+        color: #111;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 5px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        margin-top: -8px;
+        z-index: 2;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    /* Weather Popup Specifics */
+    .weather-popup-header {
+        display: flex; align-items: center; gap: 8px;
+        border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px;
+    }
+    .weather-popup-city { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #2563eb; }
+    .weather-current-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .weather-current-temp { font-size: 24px; font-weight: 700; color: #111; }
+    .weather-current-desc { font-size: 12px; color: #666; font-style: italic; }
+    .forecast-row { display: flex; justify-content: space-between; font-size: 11px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #eee; }
+    .forecast-day { font-weight: 700; color: #444; width: 40px; }
+    .forecast-icon { width: 20px; height: 20px; vertical-align: middle; }
+    .forecast-temp { font-weight: 600; color: #111; text-align: right; }
 
   </style>
 </head>
@@ -237,6 +282,11 @@
             <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
             Himawari
         </div>
+        <!-- NEW WEATHER API INTEGRATION -->
+        <div class="menu-item" id="layer-ph-weather">
+            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V21.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+            PH Weather
+        </div>
     </div>
 
     <div class="menu-section">
@@ -273,13 +323,13 @@
 <script>
 // --- CONFIGURATION ---
 maptilersdk.config.apiKey = "oBs59fy19AM2IhfJXOvI";
+const WEATHER_API_KEY = "32958a90bf3b489b880125251251912";
 
 // --- GLOBAL VARIABLES ---
 const map = new maptilersdk.Map({
   container: "map",
-  // CHANGED: Default to streets for light mode
   style: maptilersdk.MapStyle.STREETS, 
-  center: [122.0, 20.5], 
+  center: [122.0, 13.5], // Centered slightly lower to show more of PH
   zoom: 5.5,
   hash: true,
   attributionControl: false
@@ -297,6 +347,26 @@ let isAnimating = false;
 let animationInterval = null;
 let animationTimeSpan = document.getElementById('animation-time');
 let playPauseButton = document.getElementById('anim-play-pause');
+
+// Weather API Variables
+let weatherMarkers = [];
+let weatherDataCache = {};
+let weatherLayerVisible = false;
+
+const PH_LOCATIONS = [
+    { name: "Basco, Batanes", lat: 20.4508, lon: 121.9746 },
+    { name: "Laoag City", lat: 18.1978, lon: 120.5957 },
+    { name: "Baguio City", lat: 16.4023, lon: 120.5960 },
+    { name: "Metro Manila", lat: 14.6091, lon: 121.0223 },
+    { name: "Legazpi City", lat: 13.1412, lon: 123.7407 },
+    { name: "Puerto Princesa", lat: 9.7407, lon: 118.7301 },
+    { name: "Iloilo City", lat: 10.7202, lon: 122.5621 },
+    { name: "Cebu City", lat: 10.3167, lon: 123.8907 },
+    { name: "Tacloban City", lat: 11.2433, lon: 125.0047 },
+    { name: "Cagayan de Oro", lat: 8.4822, lon: 124.6472 },
+    { name: "Davao City", lat: 7.1907, lon: 125.4553 },
+    { name: "Zamboanga City", lat: 6.9042, lon: 122.0761 }
+];
 
 // --- UTILITY ---
 function convertDate(isoString) {
@@ -316,9 +386,99 @@ function getGIBSDate(offsetDays = 0) {
     return `${year}-${month}-${day}`;
 }
 
+// --- WEATHER API FUNCTIONS ---
+async function fetchWeather(location) {
+    const cacheKey = `${location.lat},${location.lon}`;
+    if (weatherDataCache[cacheKey]) return weatherDataCache[cacheKey];
+
+    try {
+        const url = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${location.lat},${location.lon}&days=3&aqi=no&alerts=no`;
+        const response = await fetch(url);
+        const data = await response.json();
+        weatherDataCache[cacheKey] = data;
+        return data;
+    } catch (error) {
+        console.error("Error fetching weather:", error);
+        return null;
+    }
+}
+
+async function toggleWeatherLayer() {
+    const btn = document.getElementById('layer-ph-weather');
+    
+    if (weatherLayerVisible) {
+        // Hide
+        weatherMarkers.forEach(marker => marker.remove());
+        weatherMarkers = [];
+        weatherLayerVisible = false;
+        btn.classList.remove('active');
+    } else {
+        // Show
+        btn.classList.add('active');
+        weatherLayerVisible = true;
+        
+        // Fetch and display
+        for (const loc of PH_LOCATIONS) {
+            const data = await fetchWeather(loc);
+            if (data) {
+                createWeatherMarker(loc, data);
+            }
+        }
+    }
+}
+
+function createWeatherMarker(loc, data) {
+    if (!weatherLayerVisible) return;
+
+    const current = data.current;
+    const forecast = data.forecast.forecastday;
+
+    // Create custom marker element
+    const el = document.createElement('div');
+    el.className = 'weather-marker';
+    el.innerHTML = `
+        <img class="weather-icon-img" src="https:${current.condition.icon}" alt="Weather">
+        <div class="weather-temp-badge">${Math.round(current.temp_c)}°</div>
+    `;
+
+    // Create popup content
+    let forecastHTML = '';
+    forecast.forEach((day, index) => {
+        const dateName = index === 0 ? 'Today' : (index === 1 ? 'Tmrw' : new Date(day.date).toLocaleDateString('en-US', {weekday:'short'}));
+        forecastHTML += `
+            <div class="forecast-row">
+                <span class="forecast-day">${dateName}</span>
+                <img class="forecast-icon" src="https:${day.day.condition.icon}">
+                <span class="forecast-temp">${Math.round(day.day.maxtemp_c)}° / ${Math.round(day.day.mintemp_c)}°</span>
+            </div>
+        `;
+    });
+
+    const popupContent = `
+        <div class="weather-popup-header">
+            <span class="weather-popup-city">${loc.name}</span>
+        </div>
+        <div class="weather-current-row">
+            <div class="weather-current-temp">${Math.round(current.temp_c)}°C</div>
+            <div class="weather-current-desc">${current.condition.text}</div>
+        </div>
+        ${forecastHTML}
+    `;
+
+    const popup = new maptilersdk.Popup({ offset: 25, closeButton: false, className: 'weather-popup' })
+        .setHTML(popupContent);
+
+    const marker = new maptilersdk.Marker({ element: el })
+        .setLngLat([loc.lon, loc.lat])
+        .setPopup(popup)
+        .addTo(map);
+
+    weatherMarkers.push(marker);
+}
+
 // --- ICON SVG GENERATOR ---
 function createIconSVG(type, size = 32) {
-  const blue = '#2563eb'; // Updated blue
+  const blue = '#2563eb'; 
   const red = '#ef4444'; 
   const white = '#ffffff';
   let color = blue;
@@ -328,13 +488,10 @@ function createIconSVG(type, size = 32) {
 
   // Shape Logic
   if (type === 'CURRENT' || type === 'T') {
-      // Typhoon Symbol (Pin with gap)
       innerShape = `<circle cx="16" cy="16" r="6" fill="${white}"/>`;
   } else if (type === 'S') {
-      // Storm (Circle)
       innerShape = `<circle cx="16" cy="16" r="8" stroke="${white}" stroke-width="3" fill="none"/>`;
   } else if (type === 'L') {
-      // Low (L)
       innerShape = `<text x="16" y="21" font-family="Arial" font-weight="bold" font-size="14" fill="${white}" text-anchor="middle">L</text>`;
   } else {
       innerShape = `<circle cx="16" cy="16" r="4" fill="${white}"/>`;
@@ -372,7 +529,7 @@ function addTrackLayers(){
   map.addLayer({ 
       id: 'track-line', type: 'line', source: 'track-line-src', 
       paint: {
-        'line-color': ['case', ['<=', ['line-progress'], 0.2], '#fbbf24', '#ef4444'], // Yellow to Red
+        'line-color': ['case', ['<=', ['line-progress'], 0.2], '#fbbf24', '#ef4444'], 
         'line-width': 4,
         'line-dasharray': ['case', ['<=', ['line-progress'], 0.2], ['literal', [1, 0]], ['literal', [2, 1.5]]]
       }
@@ -388,7 +545,7 @@ function addTrackLayers(){
       'text-offset': [0, 1.8], 'text-anchor': 'top', 'text-allow-overlap': false
     },
     paint: { 
-        'text-color': '#111827', // Dark text for white map
+        'text-color': '#111827', 
         'text-halo-color': '#ffffff', 
         'text-halo-width': 3 
     }
@@ -486,7 +643,10 @@ function clearWeatherLayers(keep = null){
     });
     radarLayer = cloudLayer = windLayer = tempLayer = himawariLayer = null;
     activeWeatherLayerRef = null;
-    document.querySelectorAll('#menu-panel [data-layer]').forEach(b => b.classList.remove('active'));
+    
+    // Deactivate standard weather buttons
+    const weatherBtns = ["layer-radar", "layer-cloud", "layer-wind", "layer-temp", "layer-himawari"];
+    weatherBtns.forEach(id => document.getElementById(id).classList.remove('active'));
     
     if (keep) {
         activeWeatherLayerRef = keep;
@@ -526,6 +686,11 @@ document.getElementById("layer-himawari").onclick = () => {
     if (himawariLayer) { clearWeatherLayers(); return; }
     clearWeatherLayers();
     handleHimawariToggle();
+};
+
+document.getElementById("layer-ph-weather").onclick = () => {
+    // Only toggle the weather API layer, don't clear the base Maptiler layers
+    toggleWeatherLayer();
 };
 
 function handleHimawariToggle(attempt = 0) {
@@ -585,6 +750,11 @@ document.querySelectorAll('#menu-panel [data-style]').forEach(btn => {
         map.once('style.load', () => {
             if (trackVisible) { removeTrackLayers(); addTrackLayers(); }
             clearWeatherLayers(); 
+            // Re-add weather markers if they were visible
+            if (weatherLayerVisible) {
+                weatherLayerVisible = false; // Reset toggle
+                toggleWeatherLayer(); // Re-enable
+            }
         });
     });
 });
@@ -617,4 +787,4 @@ map.on("load", async ()=>{
 });
 </script>
 </body>
-</html>
+  </html>
