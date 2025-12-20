@@ -701,7 +701,7 @@ function handleHimawariToggle(attempt = 0) {
     try {
         map.addSource('himawari-src', { type: 'raster', tiles: [tileURL], tileSize: 256 });
         himawariLayer = { id: 'himawari-layer' };
-        map.addLayer({ id: 'himawari-layer', type: 'raster', source: 'himawari-src', paint: { 'raster-opacity': 0.6 } }, 'track-line');
+        map.addLayer({ id: 'himawari-layer', type: 'raster', source: 'himawari-src', paint: { 'raster-opacity': 0.48 } }, 'track-line');
         document.getElementById("layer-himawari").classList.add("active");
         updateWeatherLegend('Himawari');
         activeWeatherLayerRef = himawariLayer;
@@ -777,7 +777,7 @@ map.on("load", async ()=>{
     populateLegend();
     
     // Auto-load Radar
-    radarLayer = new maptilerweather.RadarLayer({opacity:0.6, id: 'radar-layer'});
+    radarLayer = new maptilerweather.RadarLayer({opacity:0.4, id: 'radar-layer'});
     map.addLayer(radarLayer, 'track-line');
     document.getElementById("layer-radar").classList.add("active");
     activeWeatherLayerRef = radarLayer;
