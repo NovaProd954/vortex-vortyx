@@ -1,431 +1,373 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Vortyx Typhoon Tracker – TY UWAN</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  
-  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.umd.min.js"></script>
-  <link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.css" rel="stylesheet" />
-  <script src="https://cdn.maptiler.com/maptiler-weather/v2.0.0/maptiler-weather.umd.min.js"></script>
-  <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+<meta charset="utf-8" />
+<title>Vortyx Typhoon Tracker – TY UWAN</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <style>
-    /* -------------------------------------- */
-    /* SPLASH SCREEN STYLES                   */
-    /* -------------------------------------- */
-    #splash-screen {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background-color: #ffffff;
-        z-index: 9999; /* Top priority */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: opacity 0.8s cubic-bezier(0.65, 0, 0.35, 1);
-    }
+<script src="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.umd.min.js"></script>
 
-    #splash-screen.fade-out {
-        opacity: 0;
-        pointer-events: none;
-    }
+<link href="https://cdn.maptiler.com/maptiler-sdk-js/v2.0.3/maptiler-sdk.css" rel="stylesheet" />
+<script src="https://cdn.maptiler.com/maptiler-weather/v2.0.0/maptiler-weather.umd.min.js"></script>
+<script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
 
-    /* Splash Container */
-    .lockup-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        transform: scale(1.5); /* Big impact */
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    /* The V Icon */
-    .icon-box {
-        width: 90px; height: 90px;
-        position: relative; flex-shrink: 0; z-index: 2;
-        margin-right: -26px; /* Stick text to V */
-    }
+<style>
+#splash-screen {
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background-color: #ffffff;
+z-index: 9999;
+display: flex;
+justify-content: center;
+align-items: center;
+transition: opacity 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+}
 
-    /* SVG Logic */
-    .splash-svg { width: 100%; height: 100%; overflow: visible; }
+#splash-screen.fade-out {
+opacity: 0;
+pointer-events: none;
+}
 
-    /* The Text Mask */
-    .text-mask {
-        width: 0; overflow: hidden;
-        display: flex; align-items: center;
-        opacity: 0;
-    }
+.lockup-container {
+display: flex;
+align-items: center;
+justify-content: center;
+position: relative;
+transform: scale(1.5);
+}
 
-    .brand-text-splash {
-        font-family: 'Unbounded', sans-serif;
-        font-size: 3.8rem; font-weight: 700; line-height: 1;
-        padding-bottom: 5px;
-        background: linear-gradient(135deg, #00A3D9 0%, #0047B3 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        transform: translateX(-40px);
-    }
+.icon-box {
+width: 90px; height: 90px;
+position: relative; flex-shrink: 0; z-index: 2;
+margin-right: -26px;
+}
 
-    /* Animation Classes (Toggled via JS) */
-    .anim-stroke { stroke-dasharray: 600; stroke-dashoffset: 600; animation: drawV 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .anim-fill { opacity: 0; animation: fadeV 0.6s ease-out forwards 0.8s; }
-    .anim-mask { animation: expandMask 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards 1.2s; }
-    .anim-text { animation: slideLetters 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards 1.2s; }
+.splash-svg { width: 100%; height: 100%; overflow: visible; }
 
-    /* Keyframes */
-    @keyframes drawV { to { stroke-dashoffset: 0; } }
-    @keyframes fadeV { to { opacity: 1; } }
-    @keyframes expandMask { 0% { width: 0; opacity: 0; } 100% { width: 220px; opacity: 1; } }
-    @keyframes slideLetters { 0% { transform: translateX(-50px); } 100% { transform: translateX(0); } }
+.text-mask {
+width: 0; overflow: hidden;
+display: flex; align-items: center;
+opacity: 0;
+/* Ensure text doesn't get cut off during expansion */
+padding-right: 20px;
+}
 
+.brand-text-splash {
+font-family: 'Unbounded', sans-serif;
+font-size: 3.8rem; font-weight: 700; line-height: 1;
+padding-bottom: 5px;
+background: linear-gradient(135deg, #00A3D9 0%, #0047B3 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+transform: translateX(-40px);
+white-space: nowrap;
+}
 
-    /* -------------------------------------- */
-    /* MAIN APP THEME VARIABLES               */
-    /* -------------------------------------- */
-    :root {
-        --bg-color: #f8f9fa;
-        --glass-bg: rgba(255, 255, 255, 0.75);
-        --glass-border: 1px solid rgba(255, 255, 255, 0.6);
-        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-        --accent-blue: #2563eb;
-        --accent-gradient: linear-gradient(135deg, #2563eb, #1e40af);
-        --text-main: #1f2937;
-        --text-muted: #6b7280;
-        --font-stack: 'Inter', sans-serif;
-        --font-display: 'Unbounded', sans-serif;
-    }
+.anim-stroke { stroke-dasharray: 600; stroke-dashoffset: 600; animation: drawV 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.anim-fill { opacity: 0; animation: fadeV 0.6s ease-out forwards 0.8s; }
+.anim-mask { animation: expandMask 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards 1.2s; }
+.anim-text { animation: slideLetters 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards 1.2s; }
 
-    /* -------------------------------------- */
-    /* CORE LAYOUT                            */
-    /* -------------------------------------- */
-    html, body { 
-        height: 100%; margin: 0; padding: 0; 
-        background-color: var(--bg-color); 
-        color: var(--text-main);
-        font-family: var(--font-stack);
-        overflow: hidden;
-        -webkit-font-smoothing: antialiased;
-    }
+@keyframes drawV { to { stroke-dashoffset: 0; } }
+@keyframes fadeV { to { opacity: 1; } }
+@keyframes expandMask { 0% { width: 0; opacity: 0; } 100% { width: 320px; opacity: 1; } } /* Increased width to prevent cutoff */
+@keyframes slideLetters { 0% { transform: translateX(-50px); } 100% { transform: translateX(0); } }
 
-    #map { position:absolute; inset: 0; width:100%; height: 100%; z-index: 0; }
+:root {
+--bg-color: #f8f9fa;
+--glass-bg: rgba(255, 255, 255, 0.75);
+--glass-border: 1px solid rgba(255, 255, 255, 0.6);
+--glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+--accent-blue: #2563eb;
+--accent-gradient: linear-gradient(135deg, #2563eb, #1e40af);
+--text-main: #1f2937;
+--text-muted: #6b7280;
+--font-stack: 'Inter', sans-serif;
+--font-display: 'Unbounded', sans-serif;
+}
 
-    /* -------------------------------------- */
-    /* UI COMPONENTS                          */
-    /* -------------------------------------- */
-    .glass-panel {
-        background: var(--glass-bg);
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
-        border: var(--glass-border);
-        box-shadow: var(--glass-shadow);
-        border-radius: 18px;
-        pointer-events: auto;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+html, body {
+height: 100%; margin: 0; padding: 0;
+background-color: var(--bg-color);
+color: var(--text-main);
+font-family: var(--font-stack);
+overflow: hidden;
+-webkit-font-smoothing: antialiased;
+}
 
-    #app-header {
-        position: absolute; top: 20px; left: 20px; z-index: 100;
-        display: flex; align-items: center; gap: 12px;
-        pointer-events: none;
-        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); 
-    }
-    #app-logo-svg { width: 42px; height: 42px; }
-    #app-name {
-        font-family: var(--font-display);
-        font-size: 24px; font-weight: 700; letter-spacing: -0.5px;
-        color: #111; text-shadow: 2px 2px 0px rgba(255,255,255,0.8);
-    }
+#map { position:absolute; inset: 0; width:100%; height: 100%; z-index: 0; }
 
-    #menu-panel {
-        position: absolute; top: 90px; left: 20px; z-index: 100;
-        width: 210px; padding: 12px;
-        display: flex; flex-direction: column; gap: 16px;
-        max-height: calc(100vh - 140px); overflow-y: auto;
-    }
-    #menu-panel::-webkit-scrollbar { width: 4px; }
-    #menu-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+.glass-panel {
+background: var(--glass-bg);
+backdrop-filter: blur(16px) saturate(180%);
+-webkit-backdrop-filter: blur(16px) saturate(180%);
+border: var(--glass-border);
+box-shadow: var(--glass-shadow);
+border-radius: 18px;
+pointer-events: auto;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-    .menu-section-title {
-        font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px;
-        color: var(--text-muted); font-weight: 700; margin: 0 0 8px 4px;
-        display: flex; align-items: center;
-    }
-    .menu-section-title::before {
-        content: ''; display: inline-block; width: 3px; height: 12px;
-        background: var(--accent-blue); margin-right: 8px; border-radius: 2px; opacity: 0.6;
-    }
+#app-header {
+position: absolute; top: 20px; left: 20px; z-index: 100;
+display: flex; align-items: center; gap: 12px;
+pointer-events: none;
+filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+#app-logo-svg { width: 42px; height: 42px; }
+#app-name {
+font-family: var(--font-display);
+font-size: 24px; font-weight: 700; letter-spacing: -0.5px;
+color: #111; text-shadow: 2px 2px 0px rgba(255,255,255,0.8);
+}
 
-    .menu-item {
-        display: flex; align-items: center; gap: 12px;
-        padding: 11px 14px; border-radius: 12px;
-        cursor: pointer; transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        font-size: 13px; font-weight: 600; color: var(--text-main);
-        border: 1px solid transparent; position: relative; overflow: hidden;
-    }
-    .menu-item:hover { background: rgba(255,255,255,0.6); transform: translateY(-2px); color: #000; }
-    .menu-item.active { background: var(--accent-gradient); color: #fff; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
-    .menu-item.active svg { fill: #fff; }
-    
-    @keyframes shimmer { 0% { transform: translateX(-150%) skewX(-15deg); } 100% { transform: translateX(150%) skewX(-15deg); } }
-    .menu-item.active::after {
-        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        transform: skewX(-15deg); animation: shimmer 2s infinite;
-    }
+#menu-panel {
+position: absolute; top: 90px; left: 20px; z-index: 100;
+width: 210px; padding: 12px;
+display: flex; flex-direction: column; gap: 16px;
+max-height: calc(100vh - 140px); overflow-y: auto;
+}
+#menu-panel::-webkit-scrollbar { width: 4px; }
+#menu-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 
-    .menu-item .menu-item-icon { width: 20px; height: 20px; fill: #6b7280; transition: fill 0.2s; }
-    .menu-item:hover .menu-item-icon { fill: #111; }
-    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; display: none; margin-left: auto; }
-    .active .spinner { display: block; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    
-    #info-panel {
-        position: absolute; top: 20px; right: 20px; z-index: 100;
-        width: 240px; padding: 20px;
-        border-left: 5px solid #f59e0b;
-        background: rgba(255, 255, 255, 0.95);
-    }
-    #info-panel h3 { margin: 0 0 6px 0; font-size: 16px; font-weight: 800; color: #111; letter-spacing: -0.5px; font-family: var(--font-display); }
-    .issued-text { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; justify-content: space-between; }
-    .issued-text span { color: #111; font-weight: 700; background: #f3f4f6; padding: 2px 6px; border-radius: 4px;}
+.menu-section-title {
+font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px;
+color: var(--text-muted); font-weight: 700; margin: 0 0 8px 4px;
+display: flex; align-items: center;
+}
+.menu-section-title::before {
+content: ''; display: inline-block; width: 3px; height: 12px;
+background: var(--accent-blue); margin-right: 8px; border-radius: 2px; opacity: 0.6;
+}
 
-    #legend-container-icons { position: absolute; top: 240px; right: 20px; z-index: 99; width: 210px; padding: 16px; }
-    .legend-row { display: flex; align-items: center; gap: 10px; font-size: 12px; margin-bottom: 8px; color: var(--text-main); font-weight: 500; }
-    
-    #legend-container-weather { position: absolute; bottom: 80px; right: 20px; z-index: 99; width: 220px; padding: 16px; display: none; border-top: 3px solid var(--accent-blue); }
-    .legend-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-main); text-transform: uppercase; }
-    .legend-bar { height: 10px; width: 100%; border-radius: 20px; margin: 8px 0; border: 1px solid rgba(0,0,0,0.1); }
-    .legend-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-weight: 600; }
+.menu-item {
+display: flex; align-items: center; gap: 12px;
+padding: 11px 14px; border-radius: 12px;
+cursor: pointer; transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+font-size: 13px; font-weight: 600; color: var(--text-main);
+border: 1px solid transparent; position: relative; overflow: hidden;
+}
+.menu-item:hover { background: rgba(255,255,255,0.6); transform: translateY(-2px); color: #000; }
+.menu-item.active { background: var(--accent-gradient); color: #fff; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
+.menu-item.active svg { fill: #fff; }
 
-    #animation-controls {
-        position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100;
-        display: flex; align-items: center; gap: 15px; padding: 8px 12px;
-        border-radius: 100px; background: rgba(255, 255, 255, 0.9);
-    }
-    .anim-btn { background: transparent; border: none; color: var(--text-main); cursor: pointer; padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-    .anim-btn:hover { background: #f3f4f6; color: var(--accent-blue); transform: scale(1.1); }
-    .anim-btn.play-pause { background: var(--text-main); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    .anim-btn.play-pause:hover { background: var(--accent-blue); transform: scale(1.1); }
-    #animation-time { font-family: 'Inter', monospace; font-size: 14px; font-weight: 700; color: var(--accent-blue); min-width: 90px; text-align: center; background: rgba(37, 99, 235, 0.1); padding: 6px 12px; border-radius: 6px; }
+@keyframes shimmer { 0% { transform: translateX(-150%) skewX(-15deg); } 100% { transform: translateX(150%) skewX(-15deg); } }
+.menu-item.active::after {
+content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+transform: skewX(-15deg); animation: shimmer 2s infinite;
+}
 
-    .mapboxgl-popup-content { background: #ffffff; color: #1f2937; border-radius: 16px; padding: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); font-family: var(--font-stack); min-width: 220px; }
-    .popup-title { color: #f59e0b; font-weight: 800; margin-bottom: 8px; font-size: 14px; border-bottom: 2px solid #f3f4f6; padding-bottom: 8px; font-family: var(--font-display); }
-    .popup-line { font-size: 12px; margin-bottom: 6px; color: #6b7280; display: flex; justify-content: space-between; }
-    
-    .weather-marker { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s; }
-    .weather-marker:hover { transform: scale(1.2) translateY(-5px); z-index: 1000; }
-    .weather-icon-img { width: 40px; height: 40px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); }
-    .weather-temp-badge { background: #fff; color: #111; font-size: 11px; font-weight: 800; padding: 3px 6px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); margin-top: -10px; z-index: 2; border: 1px solid rgba(0,0,0,0.05); }
+.menu-item .menu-item-icon { width: 20px; height: 20px; fill: #6b7280; transition: fill 0.2s; }
+.menu-item:hover .menu-item-icon { fill: #111; }
+.spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; display: none; margin-left: auto; }
+.active .spinner { display: block; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    @media (max-width: 768px) {
-        #app-name { font-size: 18px; }
-        #menu-panel { top: 70px; left: 10px; width: 50px; padding: 8px; overflow: visible; }
-        .menu-item { padding: 10px; justify-content: center; }
-        .menu-item span, .menu-section-title { display: none; }
-        #menu-panel:hover { width: 180px; }
-        #menu-panel:hover .menu-item span { display: block; }
-        #menu-panel:hover .menu-section-title { display: flex; }
-        #info-panel { top: 70px; right: 10px; width: 180px; padding: 12px; }
-        #legend-container-icons { display: none; }
-        #animation-controls { width: 90%; justify-content: center; bottom: 20px; }
-    }
-  </style>
+#info-panel {
+position: absolute; top: 20px; right: 20px; z-index: 100;
+width: 240px; padding: 20px;
+border-left: 5px solid #f59e0b;
+background: rgba(255, 255, 255, 0.95);
+}
+#info-panel h3 { margin: 0 0 6px 0; font-size: 16px; font-weight: 800; color: #111; letter-spacing: -0.5px; font-family: var(--font-display); }
+.issued-text { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: flex; justify-content: space-between; }
+.issued-text span { color: #111; font-weight: 700; background: #f3f4f6; padding: 2px 6px; border-radius: 4px;}
+
+#legend-container-icons { position: absolute; top: 240px; right: 20px; z-index: 99; width: 210px; padding: 16px; }
+.legend-row { display: flex; align-items: center; gap: 10px; font-size: 12px; margin-bottom: 8px; color: var(--text-main); font-weight: 500; }
+
+#legend-container-weather { position: absolute; bottom: 80px; right: 20px; z-index: 99; width: 220px; padding: 16px; display: none; border-top: 3px solid var(--accent-blue); }
+.legend-title { font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-main); text-transform: uppercase; }
+.legend-bar { height: 10px; width: 100%; border-radius: 20px; margin: 8px 0; border: 1px solid rgba(0,0,0,0.1); }
+.legend-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); font-weight: 600; }
+
+#animation-controls {
+position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100;
+display: flex; align-items: center; gap: 15px; padding: 8px 12px;
+border-radius: 100px; background: rgba(255, 255, 255, 0.9);
+}
+.anim-btn { background: transparent; border: none; color: var(--text-main); cursor: pointer; padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.anim-btn:hover { background: #f3f4f6; color: var(--accent-blue); transform: scale(1.1); }
+.anim-btn.play-pause { background: var(--text-main); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.anim-btn.play-pause:hover { background: var(--accent-blue); transform: scale(1.1); }
+#animation-time { font-family: 'Inter', monospace; font-size: 14px; font-weight: 700; color: var(--accent-blue); min-width: 90px; text-align: center; background: rgba(37, 99, 235, 0.1); padding: 6px 12px; border-radius: 6px; }
+
+.mapboxgl-popup-content { background: #ffffff; color: #1f2937; border-radius: 16px; padding: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); font-family: var(--font-stack); min-width: 220px; }
+.popup-title { color: #f59e0b; font-weight: 800; margin-bottom: 8px; font-size: 14px; border-bottom: 2px solid #f3f4f6; padding-bottom: 8px; font-family: var(--font-display); }
+.popup-line { font-size: 12px; margin-bottom: 6px; color: #6b7280; display: flex; justify-content: space-between; }
+
+.weather-marker { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s; }
+.weather-marker:hover { transform: scale(1.2) translateY(-5px); z-index: 1000; }
+.weather-icon-img { width: 40px; height: 40px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); }
+.weather-temp-badge { background: #fff; color: #111; font-size: 11px; font-weight: 800; padding: 3px 6px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); margin-top: -10px; z-index: 2; border: 1px solid rgba(0,0,0,0.05); }
+
+@media (max-width: 768px) {
+#app-name { font-size: 18px; }
+#menu-panel { top: 70px; left: 10px; width: 50px; padding: 8px; overflow: visible; }
+.menu-item { padding: 10px; justify-content: center; }
+.menu-item span, .menu-section-title { display: none; }
+#menu-panel:hover { width: 180px; }
+#menu-panel:hover .menu-item span { display: block; }
+#menu-panel:hover .menu-section-title { display: flex; }
+#info-panel { top: 70px; right: 10px; width: 180px; padding: 12px; }
+#legend-container-icons { display: none; }
+#animation-controls { width: 90%; justify-content: center; bottom: 20px; }
+}
+</style>
+
 </head>
 <body>
 
-<!-- SPLASH SCREEN OVERLAY -->
 <div id="splash-screen">
-    <div class="lockup-container">
-        <!-- The V -->
-        <div class="icon-box">
-            <svg class="splash-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stop-color="#00A3D9"/>
-                        <stop offset="100%" stop-color="#0047B3"/>
-                    </linearGradient>
-                </defs>
-                <!-- Stroke -->
-                <path id="splash-stroke" class="anim-stroke"
-                      d="M50,60 C95,170, 105,170, 150,60 L135,60 C100,130, 90,130, 65,60 Z"
-                      fill="none" stroke="url(#brandGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-                <!-- Fill -->
-                <path id="splash-fill" class="anim-fill"
-                      d="M50,60 C95,170, 105,170, 150,60 L135,60 C100,130, 90,130, 65,60 Z"
-                      fill="url(#brandGrad)"/>
-            </svg>
-        </div>
-        <!-- The Text -->
-        <div id="splash-mask" class="text-mask anim-mask">
-            <span id="splash-text" class="brand-text-splash anim-text">ortyx</span>
-        </div>
-    </div>
+<div class="lockup-container">
+<div class="icon-box">
+<svg class="splash-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0%" stop-color="#00A3D9"/>
+<stop offset="100%" stop-color="#0047B3"/>
+</linearGradient>
+</defs>
+<path id="splash-stroke" class="anim-stroke"
+d="M50,60 C95,170, 105,170, 150,60 L135,60 C100,130, 90,130, 65,60 Z"
+fill="none" stroke="url(#brandGrad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="splash-fill" class="anim-fill"
+d="M50,60 C95,170, 105,170, 150,60 L135,60 C100,130, 90,130, 65,60 Z"
+fill="url(#brandGrad)"/>
+</svg>
+</div>
+<div id="splash-mask" class="text-mask anim-mask">
+<span id="splash-text" class="brand-text-splash anim-text">ortyx</span>
+</div>
+</div>
 </div>
 
-<!-- MAIN APPLICATION -->
 <div id="map"></div>
 
 <div id="app-header">
-    <div id="app-logo-svg">
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#2563eb"/>
-                    <stop offset="100%" stop-color="#1e40af"/>
-                </linearGradient>
-            </defs>
-            <rect x="0" y="0" width="200" height="200" rx="50" ry="50" fill="url(#bgGrad)"/>
-            <path d="M50,60 C95,170, 105,170, 150,60 L135,60 C100,130, 90,130, 65,60 Z" fill="none" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="600" stroke-dashoffset="600">
-                <animate attributeName="stroke-dashoffset" from="600" to="0" dur="2s" repeatCount="indefinite"/>
-            </path>
-        </svg>
-    </div>
-    <span id="app-name">VORTYX</span>
+<div id="app-logo-svg">
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0%" stop-color="#2563eb"/>
+<stop offset="100%" stop-color="#1e40af"/>
+</linearGradient>
+</defs>
+<rect x="0" y="0" width="200" height="200" rx="50" ry="50" fill="url(#bgGrad)"/>
+<path d="M50,60 C95,170, 105,170, 150,60 L135,60 C100,130, 90,130, 65,60 Z" fill="none" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="600" stroke-dashoffset="600">
+<animate attributeName="stroke-dashoffset" from="600" to="0" dur="2s" repeatCount="indefinite"/>
+</path>
+</svg>
+</div>
+<span id="app-name">VORTYX</span>
 </div>
 
 <div id="menu-panel" class="glass-panel">
-    <div class="menu-section">
-        <div class="menu-section-title">Base Maps</div>
-        <div class="menu-item active" data-style="STREETS"> 
-            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm8 2v4h8v-4h-8z"/></svg><span>Light</span>
-        </div>
-        <div class="menu-item" data-style="SATELLITE">
-            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4-10h-2V7h-4v3H8l4 4 4-4z"/></svg><span>Satellite</span>
-        </div>
-        <div class="menu-item" data-style="DARK_DATAVIZ">
-            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M20 15.31V8.69L16.69 4H8.69L4 8.69v6.62L7.31 20h6.62L20 15.31zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg><span>Dark</span>
-        </div>
-    </div>
-    <div class="menu-section">
-        <div class="menu-section-title">Layers</div>
-        <div class="menu-item" id="layer-radar" data-layer="Radar">
-            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 13h2v6h-2zm0-8h2v6h-2z"/></svg><span>Radar</span>
-        </div>
-        <div class="menu-item" id="layer-cloud" data-layer="Cloud">
-            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.86 8.32 1 10.59 1 13c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg><span>Clouds</span>
-        </div>
-        <div class="menu-item" id="layer-wind" data-layer="Wind">
-            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.95 7.95 0 0020 12c0-4.42-3.58-8-8-8z"/></svg><span>Wind</span>
-        </div>
-        <div class="menu-item" id="layer-temp" data-layer="Temp">
-            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M15 13V5c0-1.66-1.34-3-3-3S9 3.34 9 5v8c-1.21.91-2 2.37-2 4 0 2.76 2.24 5 5 5s5-2.24 5-5c0-1.63-.79-3.09-2-4zm-4-8c0-.55.45-1 1-1s1 .45 1 1h-2z"/></svg><span>Temp</span>
-        </div>
-        <div class="menu-item" id="layer-himawari" data-layer="Himawari">
-            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg><span>Himawari</span>
-        </div>
-        <div class="menu-item" id="layer-ph-weather">
-            <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V21.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
-            <span>PH Weather</span><div class="spinner"></div>
-        </div>
-    </div>
-    <div class="menu-section">
-      <div class="menu-section-title">Controls</div>
-      <div class="menu-item" id="btn-center-storm">
-        <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg><span>Center Storm</span>
-      </div>
-      <div class="menu-item active" id="menu-track-toggle">
-        <svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg><span>Hide Track</span>
-      </div>
-    </div>
+<div class="menu-section">
+<div class="menu-section-title">Base Maps</div>
+<div class="menu-item active" data-style="STREETS">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2v8h8V3h-8zm6 6h-4V5h4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm8 2v4h8v-4h-8z"/></svg><span>Light</span>
+</div>
+<div class="menu-item" data-style="SATELLITE">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4-10h-2V7h-4v3H8l4 4 4-4z"/></svg><span>Satellite</span>
+</div>
+<div class="menu-item" data-style="DARK_DATAVIZ">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M20 15.31V8.69L16.69 4H8.69L4 8.69v6.62L7.31 20h6.62L20 15.31zM12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg><span>Dark</span>
+</div>
+</div>
+<div class="menu-section">
+<div class="menu-section-title">Layers</div>
+<div class="menu-item" id="layer-radar" data-layer="Radar">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 13h2v6h-2zm0-8h2v6h-2z"/></svg><span>Radar</span>
+</div>
+<div class="menu-item" id="layer-cloud" data-layer="Cloud">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.86 8.32 1 10.59 1 13c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg><span>Clouds</span>
+</div>
+<div class="menu-item" id="layer-wind" data-layer="Wind">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.95 7.95 0 0020 12c0-4.42-3.58-8-8-8z"/></svg><span>Wind</span>
+</div>
+<div class="menu-item" id="layer-temp" data-layer="Temp">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M15 13V5c0-1.66-1.34-3-3-3S9 3.34 9 5v8c-1.21.91-2 2.37-2 4 0 2.76 2.24 5 5 5s5-2.24 5-5c0-1.63-.79-3.09-2-4zm-4-8c0-.55.45-1 1-1s1 .45 1 1h-2z"/></svg><span>Temp</span>
+</div>
+<div class="menu-item" id="layer-himawari" data-layer="Himawari">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg><span>Himawari</span>
+</div>
+<div class="menu-item" id="layer-ph-weather">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.79 1.41-1.41-1.79-1.79-1.41 1.41zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V21.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg>
+<span>PH Weather</span><div class="spinner"></div>
+</div>
+</div>
+<div class="menu-section">
+<div class="menu-section-title">Controls</div>
+<div class="menu-item" id="btn-center-storm">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg><span>Center Storm</span>
+</div>
+<div class="menu-item active" id="menu-track-toggle">
+<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg><span>Hide Track</span>
+</div>
+</div>
 </div>
 
 <div id="info-panel" class="glass-panel">
-  <h3>TY UWAN (FUNG-WONG)</h3>
-  <div class="issued-text">WARNING NR <span>027</span></div>
-  <div class="issued-text">ISSUED: <span>101800Z</span></div>
+<h3>TY UWAN (FUNG-WONG)</h3>
+<div class="issued-text">WARNING NR <span>027</span></div>
+<div class="issued-text">ISSUED: <span>101800Z</span></div>
 </div>
 
 <div id="legend-container-icons" class="glass-panel">
-    <div style="font-size:11px; font-weight:800; margin-bottom:12px; color:var(--text-main); font-family:var(--font-display); border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:4px;">TRACK KEY</div>
-    <div id="legend-icons"></div>
+<div style="font-size:11px; font-weight:800; margin-bottom:12px; color:var(--text-main); font-family:var(--font-display); border-bottom:1px solid rgba(0,0,0,0.1); padding-bottom:4px;">TRACK KEY</div>
+<div id="legend-icons"></div>
 </div>
 
 <div id="legend-container-weather" class="glass-panel">
-    <div id="weather-legend-content"></div>
+<div id="weather-legend-content"></div>
 </div>
 
 <div id="animation-controls" class="glass-panel">
-    <button class="anim-btn" id="anim-prev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg></button>
-    <button class="anim-btn play-pause" id="anim-play-pause"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
-    <button class="anim-btn" id="anim-next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg></button>
-    <div id="animation-time">-- : --</div>
+<button class="anim-btn" id="anim-prev"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg></button>
+<button class="anim-btn play-pause" id="anim-play-pause"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
+<button class="anim-btn" id="anim-next"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg></button>
+<div id="animation-time">-- : --</div>
 </div>
 
 <script>
-// --- SPLASH SCREEN LOGIC ---
 document.addEventListener('DOMContentLoaded', () => {
-    const splash = document.getElementById('splash-screen');
-    const els = {
-        stroke: document.getElementById('splash-stroke'),
-        fill: document.getElementById('splash-fill'),
-        mask: document.getElementById('splash-mask'),
-        text: document.getElementById('splash-text')
-    };
+const splash = document.getElementById('splash-screen');
 
-    let count = 0;
-    const maxRepeats = 3; 
-    const cycleDuration = 3000; // Time to complete one full animation + pause
-
-    // Function to reset animation classes to trigger reflow
-    function restartAnimation() {
-        // Remove classes
-        els.stroke.classList.remove('anim-stroke');
-        els.fill.classList.remove('anim-fill');
-        els.mask.classList.remove('anim-mask');
-        els.text.classList.remove('anim-text');
-
-        // Force reflow (magic browser trick to reset animations)
-        void els.stroke.offsetWidth; 
-        
-        // Add classes back
-        els.stroke.classList.add('anim-stroke');
-        els.fill.classList.add('anim-fill');
-        els.mask.classList.add('anim-mask');
-        els.text.classList.add('anim-text');
-    }
-
-    const animInterval = setInterval(() => {
-        count++;
-        if (count >= maxRepeats) {
-            clearInterval(animInterval);
-            // Fade out splash screen
-            splash.classList.add('fade-out');
-            setTimeout(() => {
-                splash.remove(); // Remove from DOM completely
-            }, 800);
-        } else {
-            restartAnimation();
-        }
-    }, cycleDuration);
+setTimeout(() => {
+splash.classList.add('fade-out');
+setTimeout(() => {
+splash.remove();
+}, 800);
+}, 5000);
 });
 
-// --- MAIN APP CONFIGURATION ---
 maptilersdk.config.apiKey = "oBs59fy19AM2IhfJXOvI";
 const WEATHER_API_KEY = "32958a90bf3b489b880125251251912";
 
-// --- GLOBAL VARIABLES ---
 const map = new maptilersdk.Map({
-  container: "map",
-  style: maptilersdk.MapStyle.STREETS, 
-  center: [122.0, 13.5], 
-  zoom: 5.5,
-  hash: true,
-  attributionControl: false
+container: "map",
+style: maptilersdk.MapStyle.STREETS,
+center: [122.0, 13.5],
+zoom: 5.5,
+hash: true,
+attributionControl: false
 });
 
-let radarLayer = null; 
-let cloudLayer = null; 
-let windLayer = null; 
-let tempLayer = null; 
-let himawariLayer = null; 
-let activeWeatherLayerRef = null; 
-let trackVisible = true; 
-let popup; 
+let radarLayer = null;
+let cloudLayer = null;
+let windLayer = null;
+let tempLayer = null;
+let himawariLayer = null;
+let activeWeatherLayerRef = null;
+let trackVisible = true;
+let popup;
 let isAnimating = false;
 let animationInterval = null;
 let animationTimeSpan = document.getElementById('animation-time');
@@ -435,257 +377,250 @@ let weatherDataCache = {};
 let weatherLayerVisible = false;
 
 const PH_LOCATIONS = [
-    { name: "Basco", lat: 20.4508, lon: 121.9746 },
-    { name: "Laoag", lat: 18.1978, lon: 120.5957 },
-    { name: "Baguio", lat: 16.4023, lon: 120.5960 },
-    { name: "Manila", lat: 14.6091, lon: 121.0223 },
-    { name: "Legazpi", lat: 13.1412, lon: 123.7407 },
-    { name: "P. Princesa", lat: 9.7407, lon: 118.7301 },
-    { name: "Iloilo", lat: 10.7202, lon: 122.5621 },
-    { name: "Cebu", lat: 10.3167, lon: 123.8907 },
-    { name: "Tacloban", lat: 11.2433, lon: 125.0047 },
-    { name: "CDO", lat: 8.4822, lon: 124.6472 },
-    { name: "Davao", lat: 7.1907, lon: 125.4553 },
-    { name: "Zamboanga", lat: 6.9042, lon: 122.0761 }
+{ name: "Basco", lat: 20.4508, lon: 121.9746 },
+{ name: "Laoag", lat: 18.1978, lon: 120.5957 },
+{ name: "Baguio", lat: 16.4023, lon: 120.5960 },
+{ name: "Manila", lat: 14.6091, lon: 121.0223 },
+{ name: "Legazpi", lat: 13.1412, lon: 123.7407 },
+{ name: "P. Princesa", lat: 9.7407, lon: 118.7301 },
+{ name: "Iloilo", lat: 10.7202, lon: 122.5621 },
+{ name: "Cebu", lat: 10.3167, lon: 123.8907 },
+{ name: "Tacloban", lat: 11.2433, lon: 125.0047 },
+{ name: "CDO", lat: 8.4822, lon: 124.6472 },
+{ name: "Davao", lat: 7.1907, lon: 125.4553 },
+{ name: "Zamboanga", lat: 6.9042, lon: 122.0761 }
 ];
 
-// --- UTILITY ---
 function convertDate(isoString) {
-    const date = new Date(isoString);
-    return date.toLocaleString('en-US', { 
-        year: 'numeric', month: 'short', day: 'numeric', 
-        hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' 
-    }) + " UTC";
+const date = new Date(isoString);
+return date.toLocaleString('en-US', {
+year: 'numeric', month: 'short', day: 'numeric',
+hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC'
+}) + " UTC";
 }
 
 function getGIBSDate(offsetDays = 0) {
-    const date = new Date();
-    date.setUTCDate(date.getUTCDate() + offsetDays); 
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-    const day = String(date.getUTCDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+const date = new Date();
+date.setUTCDate(date.getUTCDate() + offsetDays);
+const year = date.getUTCFullYear();
+const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+const day = String(date.getUTCDate()).padStart(2, '0');
+return `${year}-${month}-${day}`;
 }
 
-// --- WEATHER API FUNCTIONS ---
 async function fetchWeather(location) {
-    const cacheKey = `${location.lat},${location.lon}`;
-    if (weatherDataCache[cacheKey]) return weatherDataCache[cacheKey];
+const cacheKey = `${location.lat},${location.lon}`;
+if (weatherDataCache[cacheKey]) return weatherDataCache[cacheKey];
 
-    try {
-        const url = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${location.lat},${location.lon}&days=3&aqi=no&alerts=no`;
-        const response = await fetch(url);
-        const data = await response.json();
-        weatherDataCache[cacheKey] = data;
-        return data;
-    } catch (error) {
-        console.error("Error fetching weather:", error);
-        return null;
-    }
+try {
+const url = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${location.lat},${location.lon}&days=3&aqi=no&alerts=no`;
+const response = await fetch(url);
+const data = await response.json();
+weatherDataCache[cacheKey] = data;
+return data;
+} catch (error) {
+console.error("Error fetching weather:", error);
+return null;
+}
 }
 
 async function toggleWeatherLayer() {
-    const btn = document.getElementById('layer-ph-weather');
-    if (weatherLayerVisible) {
-        weatherMarkers.forEach(marker => marker.remove());
-        weatherMarkers = [];
-        weatherLayerVisible = false;
-        btn.classList.remove('active');
-    } else {
-        btn.classList.add('active'); 
-        const promises = PH_LOCATIONS.map(async (loc) => {
-            const data = await fetchWeather(loc);
-            if (data && btn.classList.contains('active')) {
-                createWeatherMarker(loc, data);
-            }
-        });
-        await Promise.all(promises);
-        if (btn.classList.contains('active')) {
-            weatherLayerVisible = true;
-            btn.classList.remove('loading'); 
-        }
-    }
+const btn = document.getElementById('layer-ph-weather');
+if (weatherLayerVisible) {
+weatherMarkers.forEach(marker => marker.remove());
+weatherMarkers = [];
+weatherLayerVisible = false;
+btn.classList.remove('active');
+} else {
+btn.classList.add('active');
+const promises = PH_LOCATIONS.map(async (loc) => {
+const data = await fetchWeather(loc);
+if (data && btn.classList.contains('active')) {
+createWeatherMarker(loc, data);
+}
+});
+await Promise.all(promises);
+if (btn.classList.contains('active')) {
+weatherLayerVisible = true;
+btn.classList.remove('loading');
+}
+}
 }
 
 function createWeatherMarker(loc, data) {
-    if (!document.getElementById('layer-ph-weather').classList.contains('active')) return;
-    const current = data.current;
-    const forecast = data.forecast.forecastday;
-    const el = document.createElement('div');
-    el.className = 'weather-marker';
-    el.innerHTML = `
-        <img class="weather-icon-img" src="https:${current.condition.icon}" alt="Weather">
-        <div class="weather-temp-badge">${Math.round(current.temp_c)}°</div>
-    `;
-    let forecastHTML = '';
-    forecast.forEach((day, index) => {
-        const dateName = index === 0 ? 'Today' : (index === 1 ? 'Tmrw' : new Date(day.date).toLocaleDateString('en-US', {weekday:'short'}));
-        forecastHTML += `
-            <div class="forecast-row" style="display:flex; justify-content:space-between; font-size:11px; margin-top:6px; padding-top:6px; border-top:1px dashed #eee;">
-                <span class="forecast-day" style="font-weight:700; color:#444; width:40px;">${dateName}</span>
-                <img class="forecast-icon" src="https:${day.day.condition.icon}" style="width:20px; height:20px;">
-                <span class="forecast-temp" style="font-weight:600; color:#111;">${Math.round(day.day.maxtemp_c)}° / ${Math.round(day.day.mintemp_c)}°</span>
-            </div>
-        `;
-    });
-    const popupContent = `
-        <div class="weather-popup-header" style="border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
-            <span class="weather-popup-city" style="font-family:var(--font-display); font-weight:700; font-size:15px; color:#2563eb;">${loc.name}</span>
-        </div>
-        <div class="weather-current-row" style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-            <div class="weather-current-temp" style="font-size:24px; font-weight:800; color:#111;">${Math.round(current.temp_c)}°C</div>
-            <div class="weather-current-desc" style="font-size:12px; color:#666; font-style:italic;">${current.condition.text}</div>
-        </div>
-        ${forecastHTML}
-    `;
-    const popup = new maptilersdk.Popup({ offset: 25, closeButton: false, maxWidth: '200px' }).setHTML(popupContent);
-    const marker = new maptilersdk.Marker({ element: el }).setLngLat([loc.lon, loc.lat]).setPopup(popup).addTo(map);
-    weatherMarkers.push(marker);
+if (!document.getElementById('layer-ph-weather').classList.contains('active')) return;
+const current = data.current;
+const forecast = data.forecast.forecastday;
+const el = document.createElement('div');
+el.className = 'weather-marker';
+el.innerHTML = `
+<img class="weather-icon-img" src="https:${current.condition.icon}" alt="Weather">
+<div class="weather-temp-badge">${Math.round(current.temp_c)}°</div>
+`;
+let forecastHTML = '';
+forecast.forEach((day, index) => {
+const dateName = index === 0 ? 'Today' : (index === 1 ? 'Tmrw' : new Date(day.date).toLocaleDateString('en-US', {weekday:'short'}));
+forecastHTML += `
+<div class="forecast-row" style="display:flex; justify-content:space-between; font-size:11px; margin-top:6px; padding-top:6px; border-top:1px dashed #eee;">
+<span class="forecast-day" style="font-weight:700; color:#444; width:40px;">${dateName}</span>
+<img class="forecast-icon" src="https:${day.day.condition.icon}" style="width:20px; height:20px;">
+<span class="forecast-temp" style="font-weight:600; color:#111;">${Math.round(day.day.maxtemp_c)}° / ${Math.round(day.day.mintemp_c)}°</span>
+</div>
+`;
+});
+const popupContent = `
+<div class="weather-popup-header" style="border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:8px;">
+<span class="weather-popup-city" style="font-family:var(--font-display); font-weight:700; font-size:15px; color:#2563eb;">${loc.name}</span>
+</div>
+<div class="weather-current-row" style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+<div class="weather-current-temp" style="font-size:24px; font-weight:800; color:#111;">${Math.round(current.temp_c)}°C</div>
+<div class="weather-current-desc" style="font-size:12px; color:#666; font-style:italic;">${current.condition.text}</div>
+</div>
+${forecastHTML}
+`;
+const popup = new maptilersdk.Popup({ offset: 25, closeButton: false, maxWidth: '200px' }).setHTML(popupContent);
+const marker = new maptilersdk.Marker({ element: el }).setLngLat([loc.lon, loc.lat]).setPopup(popup).addTo(map);
+weatherMarkers.push(marker);
 }
 
-// --- ICON SVG GENERATOR ---
 function createIconSVG(type, size = 32) {
-  const blue = '#2563eb'; const red = '#ef4444'; const white = '#ffffff';
-  let color = blue; let innerShape = '';
-  if (type === 'CURRENT') { color = red; }
-  if (type === 'CURRENT' || type === 'T') { innerShape = `<circle cx="16" cy="16" r="6" fill="${white}"/>`; } 
-  else if (type === 'S') { innerShape = `<circle cx="16" cy="16" r="8" stroke="${white}" stroke-width="3" fill="none"/>`; } 
-  else if (type === 'L') { innerShape = `<text x="16" y="21" font-family="Arial" font-weight="bold" font-size="14" fill="${white}" text-anchor="middle">L</text>`; } 
-  else { innerShape = `<circle cx="16" cy="16" r="4" fill="${white}"/>`; }
-  return `
-    <svg width="${size}" height="${size}" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs><filter id="shadow${type}" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/></filter></defs>
-      <g filter="url(#shadow${type})"><circle cx="16" cy="16" r="14" fill="${color}" stroke="#fff" stroke-width="2"/>${innerShape}</g>
-    </svg>`;
+const blue = '#2563eb'; const red = '#ef4444'; const white = '#ffffff';
+let color = blue; let innerShape = '';
+if (type === 'CURRENT') { color = red; }
+if (type === 'CURRENT' || type === 'T') { innerShape = `<circle cx="16" cy="16" r="6" fill="${white}"/>`; }
+else if (type === 'S') { innerShape = `<circle cx="16" cy="16" r="8" stroke="${white}" stroke-width="3" fill="none"/>`; }
+else if (type === 'L') { innerShape = `<text x="16" y="21" font-family="Arial" font-weight="bold" font-size="14" fill="${white}" text-anchor="middle">L</text>`; }
+else { innerShape = `<circle cx="16" cy="16" r="4" fill="${white}"/>`; }
+return `
+<svg width="${size}" height="${size}" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><filter id="shadow${type}" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/></filter></defs>
+<g filter="url(#shadow${type})"><circle cx="16" cy="16" r="14" fill="${color}" stroke="#fff" stroke-width="2"/>${innerShape}</g>
+</svg>`;
 }
 
-// --- TRACK DATA (UWAN) ---
 const trackGeoJSON = {
-  "type": "FeatureCollection",
-  "features": [
-    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [119.5, 17.0] }, "properties": { "time": "2025-11-10T12:00Z", "wind_kt": 70, "label": "Past", "stage": "PAST", "icon_name": "tc-icon-PAST", "category": "Typhoon" }},
-    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [118.3, 18.8] }, "properties": { "time": "2025-11-10T18:00Z", "wind_kt": 65, "label": "Current", "stage": "CURRENT", "icon_name": "tc-icon-CURRENT", "category": "Typhoon" }},
-    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [118.3, 20.0] }, "properties": { "time": "2025-11-11T06:00Z", "wind_kt": 60, "label": "+12h", "stage": "T", "icon_name": "tc-icon-T", "category": "STS" }},
-    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [118.6, 21.1] }, "properties": { "time": "2025-11-11T18:00Z", "wind_kt": 55, "label": "+24h", "stage": "S", "icon_name": "tc-icon-S", "category": "STS" }},
-    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [119.5, 22.3] }, "properties": { "time": "2025-11-12T06:00Z", "wind_kt": 50, "label": "+36h", "stage": "S", "icon_name": "tc-icon-S", "category": "STS" }},
-    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [121.1, 23.6] }, "properties": { "time": "2025-11-12T18:00Z", "wind_kt": 35, "label": "+48h", "stage": "S", "icon_name": "tc-icon-S", "category": "TS" }},
-    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [124.6, 25.2] }, "properties": { "time": "2025-11-13T18:00Z", "wind_kt": 30, "label": "+72h", "stage": "L", "icon_name": "tc-icon-L", "category": "TD" }},
-  ]
+"type": "FeatureCollection",
+"features": [
+{ "type": "Feature", "geometry": { "type": "Point", "coordinates": [119.5, 17.0] }, "properties": { "time": "2025-11-10T12:00Z", "wind_kt": 70, "label": "Past", "stage": "PAST", "icon_name": "tc-icon-PAST", "category": "Typhoon" }},
+{ "type": "Feature", "geometry": { "type": "Point", "coordinates": [118.3, 18.8] }, "properties": { "time": "2025-11-10T18:00Z", "wind_kt": 65, "label": "Current", "stage": "CURRENT", "icon_name": "tc-icon-CURRENT", "category": "Typhoon" }},
+{ "type": "Feature", "geometry": { "type": "Point", "coordinates": [118.3, 20.0] }, "properties": { "time": "2025-11-11T06:00Z", "wind_kt": 60, "label": "+12h", "stage": "T", "icon_name": "tc-icon-T", "category": "STS" }},
+{ "type": "Feature", "geometry": { "type": "Point", "coordinates": [118.6, 21.1] }, "properties": { "time": "2025-11-11T18:00Z", "wind_kt": 55, "label": "+24h", "stage": "S", "icon_name": "tc-icon-S", "category": "STS" }},
+{ "type": "Feature", "geometry": { "type": "Point", "coordinates": [119.5, 22.3] }, "properties": { "time": "2025-11-12T06:00Z", "wind_kt": 50, "label": "+36h", "stage": "S", "icon_name": "tc-icon-S", "category": "STS" }},
+{ "type": "Feature", "geometry": { "type": "Point", "coordinates": [121.1, 23.6] }, "properties": { "time": "2025-11-12T18:00Z", "wind_kt": 35, "label": "+48h", "stage": "S", "icon_name": "tc-icon-S", "category": "TS" }},
+{ "type": "Feature", "geometry": { "type": "Point", "coordinates": [124.6, 25.2] }, "properties": { "time": "2025-11-13T18:00Z", "wind_kt": 30, "label": "+72h", "stage": "L", "icon_name": "tc-icon-L", "category": "TD" }},
+]
 };
 
-// --- TRACK LAYERS ---
 function addTrackLayers(){
-  if (trackVisible) return; 
-  const coords = trackGeoJSON.features.map(f => f.geometry.coordinates);
-  map.addSource('track-line-src', { type: 'geojson', data: turf.lineString(coords) });
-  map.addLayer({ 
-      id: 'track-line', type: 'line', source: 'track-line-src', 
-      paint: {
-        'line-color': ['case', ['<=', ['line-progress'], 0.2], '#fbbf24', '#ef4444'], 
-        'line-width': 4,
-        'line-dasharray': ['case', ['<=', ['line-progress'], 0.2], ['literal', [1, 0]], ['literal', [2, 1.5]]]
-      }
-  });
-  map.addSource('track-points-src', { type: 'geojson', data: trackGeoJSON });
-  map.addLayer({
-    id: 'track-points-layer', type: 'symbol', source: 'track-points-src', interactive: true, 
-    layout: {
-      'icon-image': ['get', 'icon_name'], 'icon-size': 0.8, 'icon-allow-overlap': true,
-      'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 12,
-      'text-offset': [0, 1.8], 'text-anchor': 'top', 'text-allow-overlap': false
-    },
-    paint: { 'text-color': '#111827', 'text-halo-color': '#ffffff', 'text-halo-width': 3 }
-  });
-  const bounds = coords.reduce((b, c) => b.extend(c), new maptilersdk.LngLatBounds(coords[0], coords[0]));
-  map.fitBounds(bounds, { padding: 100, duration: 1000 });
-  trackVisible = true;
-  document.getElementById('menu-track-toggle').innerHTML = `<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg> <span>Hide Track</span>`;
+if (trackVisible) return;
+const coords = trackGeoJSON.features.map(f => f.geometry.coordinates);
+map.addSource('track-line-src', { type: 'geojson', data: turf.lineString(coords) });
+map.addLayer({
+id: 'track-line', type: 'line', source: 'track-line-src',
+paint: {
+'line-color': ['case', ['<=', ['line-progress'], 0.2], '#fbbf24', '#ef4444'],
+'line-width': 4,
+'line-dasharray': ['case', ['<=', ['line-progress'], 0.2], ['literal', [1, 0]], ['literal', [2, 1.5]]]
+}
+});
+map.addSource('track-points-src', { type: 'geojson', data: trackGeoJSON });
+map.addLayer({
+id: 'track-points-layer', type: 'symbol', source: 'track-points-src', interactive: true,
+layout: {
+'icon-image': ['get', 'icon_name'], 'icon-size': 0.8, 'icon-allow-overlap': true,
+'text-field': ['get', 'label'], 'text-font': ['Noto Sans Bold'], 'text-size': 12,
+'text-offset': [0, 1.8], 'text-anchor': 'top', 'text-allow-overlap': false
+},
+paint: { 'text-color': '#111827', 'text-halo-color': '#ffffff', 'text-halo-width': 3 }
+});
+const bounds = coords.reduce((b, c) => b.extend(c), new maptilersdk.LngLatBounds(coords[0], coords[0]));
+map.fitBounds(bounds, { padding: 100, duration: 1000 });
+trackVisible = true;
+document.getElementById('menu-track-toggle').innerHTML = `<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg> <span>Hide Track</span>`;
 }
 
 function removeTrackLayers(){
-  if (!trackVisible) return;
-  ['track-line', 'track-points-layer'].forEach(id => { if (map.getLayer(id)) map.removeLayer(id); });
-  ['track-line-src', 'track-points-src'].forEach(id => { if (map.getSource(id)) map.removeSource(id); });
-  if (popup) popup.remove();
-  trackVisible = false;
-  document.getElementById('menu-track-toggle').innerHTML = `<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 001 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg> <span>Show Track</span>`;
+if (!trackVisible) return;
+['track-line', 'track-points-layer'].forEach(id => { if (map.getLayer(id)) map.removeLayer(id); });
+['track-line-src', 'track-points-src'].forEach(id => { if (map.getSource(id)) map.removeSource(id); });
+if (popup) popup.remove();
+trackVisible = false;
+document.getElementById('menu-track-toggle').innerHTML = `<svg class="menu-item-icon" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 001 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg> <span>Show Track</span>`;
 }
 
-// --- POPUP & LEGEND ---
 function addPopupHandler() {
-    popup = new maptilersdk.Popup({ closeButton: true, closeOnClick: true, maxWidth: '240px' });
-    map.on('click', 'track-points-layer', (e) => {
-        const props = e.features[0].properties;
-        const coords = e.features[0].geometry.coordinates;
-        popup.setLngLat(coords)
-            .setHTML(`<div class="popup-title">TY UWAN (${props.category})</div>
-                      <div class="popup-line"><span>Time</span> <strong>${convertDate(props.time)}</strong></div>
-                      <div class="popup-line"><span>Wind</span> <strong>${props.wind_kt} kts</strong></div>
-                      <div class="popup-line"><span>Stage</span> <strong>${props.stage}</strong></div>`)
-            .addTo(map);
-    });
-    map.on('mouseenter', 'track-points-layer', () => map.getCanvas().style.cursor = 'pointer');
-    map.on('mouseleave', 'track-points-layer', () => map.getCanvas().style.cursor = '');
+popup = new maptilersdk.Popup({ closeButton: true, closeOnClick: true, maxWidth: '240px' });
+map.on('click', 'track-points-layer', (e) => {
+const props = e.features[0].properties;
+const coords = e.features[0].geometry.coordinates;
+popup.setLngLat(coords)
+.setHTML(`<div class="popup-title">TY UWAN (${props.category})</div>
+<div class="popup-line"><span>Time</span> <strong>${convertDate(props.time)}</strong></div>
+<div class="popup-line"><span>Wind</span> <strong>${props.wind_kt} kts</strong></div>
+<div class="popup-line"><span>Stage</span> <strong>${props.stage}</strong></div>`)
+.addTo(map);
+});
+map.on('mouseenter', 'track-points-layer', () => map.getCanvas().style.cursor = 'pointer');
+map.on('mouseleave', 'track-points-layer', () => map.getCanvas().style.cursor = '');
 }
 
 function populateLegend() {
-    const iconTypes = [{ type: 'CURRENT', label: 'Current Position' }, { type: 'T', label: 'Typhoon' }, { type: 'S', label: 'Tropical Storm' }, { type: 'L', label: 'Low / Dissipated' }];
-    const legendDiv = document.getElementById('legend-icons');
-    iconTypes.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'legend-row';
-        div.innerHTML = `<span>${createIconSVG(item.type, 18)}</span> ${item.label}`;
-        legendDiv.appendChild(div);
-    });
+const iconTypes = [{ type: 'CURRENT', label: 'Current Position' }, { type: 'T', label: 'Typhoon' }, { type: 'S', label: 'Tropical Storm' }, { type: 'L', label: 'Low / Dissipated' }];
+const legendDiv = document.getElementById('legend-icons');
+iconTypes.forEach(item => {
+const div = document.createElement('div');
+div.className = 'legend-row';
+div.innerHTML = `<span>${createIconSVG(item.type, 18)}</span> ${item.label}`;
+legendDiv.appendChild(div);
+});
 }
 
 function updateWeatherLegend(layerType) {
-    const container = document.getElementById('legend-container-weather');
-    const content = document.getElementById('weather-legend-content');
-    if (!layerType) { container.style.display = 'none'; return; }
-    let gradient = '', labels = '', title = '';
-    if (layerType === 'Radar') { title = 'Radar Reflectivity (dBZ)'; gradient = 'linear-gradient(90deg, #00cdff, #00ff00, #ffff00, #ff0000, #ff00ff)'; labels = '<span>Light</span><span>Extreme</span>'; } 
-    else if (layerType === 'Cloud') { title = 'Cloud Temperature'; gradient = 'linear-gradient(90deg, #ffffff, #808080, #000000)'; labels = '<span>Warm</span><span>Cold</span>'; } 
-    else if (layerType === 'Wind') { title = 'Wind Speed'; gradient = 'linear-gradient(90deg, #444, #00f, #f0f, #f00)'; labels = '<span>Calm</span><span>Strong</span>'; } 
-    else if (layerType === 'Temp') { title = 'Surface Temperature'; gradient = 'linear-gradient(90deg, #00f, #0ff, #ff0, #f00)'; labels = '<span>Cold</span><span>Hot</span>'; } 
-    else if (layerType === 'Himawari') { title = 'Satellite IR'; gradient = 'linear-gradient(90deg, #fff, #000)'; labels = '<span>Cloud</span><span>Clear</span>'; }
-    content.innerHTML = `<div class="legend-title">${title}</div><div class="legend-bar" style="background:${gradient}"></div><div class="legend-labels">${labels}</div>`;
-    container.style.display = 'block';
+const container = document.getElementById('legend-container-weather');
+const content = document.getElementById('weather-legend-content');
+if (!layerType) { container.style.display = 'none'; return; }
+let gradient = '', labels = '', title = '';
+if (layerType === 'Radar') { title = 'Radar Reflectivity (dBZ)'; gradient = 'linear-gradient(90deg, #00cdff, #00ff00, #ffff00, #ff0000, #ff00ff)'; labels = '<span>Light</span><span>Extreme</span>'; }
+else if (layerType === 'Cloud') { title = 'Cloud Temperature'; gradient = 'linear-gradient(90deg, #ffffff, #808080, #000000)'; labels = '<span>Warm</span><span>Cold</span>'; }
+else if (layerType === 'Wind') { title = 'Wind Speed'; gradient = 'linear-gradient(90deg, #444, #00f, #f0f, #f00)'; labels = '<span>Calm</span><span>Strong</span>'; }
+else if (layerType === 'Temp') { title = 'Surface Temperature'; gradient = 'linear-gradient(90deg, #00f, #0ff, #ff0, #f00)'; labels = '<span>Cold</span><span>Hot</span>'; }
+else if (layerType === 'Himawari') { title = 'Satellite IR'; gradient = 'linear-gradient(90deg, #fff, #000)'; labels = '<span>Cloud</span><span>Clear</span>'; }
+content.innerHTML = `<div class="legend-title">${title}</div><div class="legend-bar" style="background:${gradient}"></div><div class="legend-labels">${labels}</div>`;
+container.style.display = 'block';
 }
 
-// --- LAYER CONTROL ---
 function clearWeatherLayers(keep = null){
-    stopAnimation();
-    const refs = [radarLayer, cloudLayer, windLayer, tempLayer, himawariLayer];
-    refs.forEach(layer => {
-        if(layer && layer !== keep && map.getLayer(layer.id)) map.removeLayer(layer.id);
-        if(layer && layer.id === 'himawari-layer' && map.getSource('himawari-src')) map.removeSource('himawari-src');
-    });
-    radarLayer = cloudLayer = windLayer = tempLayer = himawariLayer = null;
-    activeWeatherLayerRef = null;
-    const weatherBtns = ["layer-radar", "layer-cloud", "layer-wind", "layer-temp", "layer-himawari"];
-    weatherBtns.forEach(id => document.getElementById(id).classList.remove('active'));
-    if (keep) {
-        activeWeatherLayerRef = keep;
-        if(keep.id.includes('radar')) radarLayer = keep;
-        if(keep.id.includes('cloud')) cloudLayer = keep;
-        if(keep.id.includes('wind')) windLayer = keep;
-        if(keep.id.includes('temp')) tempLayer = keep;
-        if(keep.id.includes('himawari')) himawariLayer = keep;
-    } else { updateWeatherLegend(null); }
+stopAnimation();
+const refs = [radarLayer, cloudLayer, windLayer, tempLayer, himawariLayer];
+refs.forEach(layer => {
+if(layer && layer !== keep && map.getLayer(layer.id)) map.removeLayer(layer.id);
+if(layer && layer.id === 'himawari-layer' && map.getSource('himawari-src')) map.removeSource('himawari-src');
+});
+radarLayer = cloudLayer = windLayer = tempLayer = himawariLayer = null;
+activeWeatherLayerRef = null;
+const weatherBtns = ["layer-radar", "layer-cloud", "layer-wind", "layer-temp", "layer-himawari"];
+weatherBtns.forEach(id => document.getElementById(id).classList.remove('active'));
+if (keep) {
+activeWeatherLayerRef = keep;
+if(keep.id.includes('radar')) radarLayer = keep;
+if(keep.id.includes('cloud')) cloudLayer = keep;
+if(keep.id.includes('wind')) windLayer = keep;
+if(keep.id.includes('temp')) tempLayer = keep;
+if(keep.id.includes('himawari')) himawariLayer = keep;
+} else { updateWeatherLegend(null); }
 }
 
 function toggleLayer(currentRef, constructor, layerType, id, colorramp = null) {
-    if (currentRef) { clearWeatherLayers(); return null; }
-    clearWeatherLayers();
-    const options = { opacity: 0.8, id: id };
-    if (colorramp) options.colorramp = colorramp;
-    const newLayer = new constructor(options);
-    map.addLayer(newLayer, 'track-line'); 
-    document.getElementById('layer-' + layerType.toLowerCase()).classList.add("active");
-    updateWeatherLegend(layerType);
-    activeWeatherLayerRef = newLayer;
-    return newLayer;
+if (currentRef) { clearWeatherLayers(); return null; }
+clearWeatherLayers();
+const options = { opacity: 0.8, id: id };
+if (colorramp) options.colorramp = colorramp;
+const newLayer = new constructor(options);
+map.addLayer(newLayer, 'track-line');
+document.getElementById('layer-' + layerType.toLowerCase()).classList.add("active");
+updateWeatherLegend(layerType);
+activeWeatherLayerRef = newLayer;
+return newLayer;
 }
 
 document.getElementById("layer-radar").onclick = () => radarLayer = toggleLayer(radarLayer, maptilerweather.RadarLayer, 'Radar', 'radar-layer');
@@ -695,84 +630,84 @@ document.getElementById("layer-temp").onclick = () => tempLayer = toggleLayer(te
 document.getElementById("layer-himawari").onclick = () => { if (himawariLayer) { clearWeatherLayers(); return; } clearWeatherLayers(); handleHimawariToggle(); };
 document.getElementById("layer-ph-weather").onclick = () => toggleWeatherLayer();
 document.getElementById("btn-center-storm").onclick = () => {
-    const currentFeat = trackGeoJSON.features.find(f => f.properties.stage === 'CURRENT');
-    if (currentFeat) map.flyTo({ center: currentFeat.geometry.coordinates, zoom: 8, speed: 1.5 });
+const currentFeat = trackGeoJSON.features.find(f => f.properties.stage === 'CURRENT');
+if (currentFeat) map.flyTo({ center: currentFeat.geometry.coordinates, zoom: 8, speed: 1.5 });
 };
 
 function handleHimawariToggle(attempt = 0) {
-    if (attempt > 1) { alert("Himawari data unavailable."); return; }
-    const dateToUse = getGIBSDate(attempt === 0 ? 0 : -1);
-    const tileURL = `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Himawari_AHI_Band13_Clean_Infrared/default/${dateToUse}/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png`;
-    try {
-        map.addSource('himawari-src', { type: 'raster', tiles: [tileURL], tileSize: 256 });
-        himawariLayer = { id: 'himawari-layer' };
-        map.addLayer({ id: 'himawari-layer', type: 'raster', source: 'himawari-src', paint: { 'raster-opacity': 0.48 } }, 'track-line');
-        document.getElementById("layer-himawari").classList.add("active");
-        updateWeatherLegend('Himawari');
-        activeWeatherLayerRef = himawariLayer;
-    } catch(e) { handleHimawariToggle(attempt + 1); }
+if (attempt > 1) { alert("Himawari data unavailable."); return; }
+const dateToUse = getGIBSDate(attempt === 0 ? 0 : -1);
+const tileURL = `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Himawari_AHI_Band13_Clean_Infrared/default/${dateToUse}/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png`;
+try {
+map.addSource('himawari-src', { type: 'raster', tiles: [tileURL], tileSize: 256 });
+himawariLayer = { id: 'himawari-layer' };
+map.addLayer({ id: 'himawari-layer', type: 'raster', source: 'himawari-src', paint: { 'raster-opacity': 0.48 } }, 'track-line');
+document.getElementById("layer-himawari").classList.add("active");
+updateWeatherLegend('Himawari');
+activeWeatherLayerRef = himawariLayer;
+} catch(e) { handleHimawariToggle(attempt + 1); }
 }
 
 function startAnimation() {
-    if (isAnimating || !activeWeatherLayerRef || !activeWeatherLayerRef.animateByFactor) return;
-    isAnimating = true;
-    playPauseButton.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
-    activeWeatherLayerRef.animateByFactor(3600);
-    animationInterval = setInterval(() => {
-        const time = new Date(activeWeatherLayerRef.getTime());
-        animationTimeSpan.textContent = time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " UTC";
-    }, 100);
+if (isAnimating || !activeWeatherLayerRef || !activeWeatherLayerRef.animateByFactor) return;
+isAnimating = true;
+playPauseButton.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+activeWeatherLayerRef.animateByFactor(3600);
+animationInterval = setInterval(() => {
+const time = new Date(activeWeatherLayerRef.getTime());
+animationTimeSpan.textContent = time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " UTC";
+}, 100);
 }
 
 function stopAnimation() {
-    isAnimating = false;
-    playPauseButton.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
-    if (animationInterval) clearInterval(animationInterval);
-    if (activeWeatherLayerRef && activeWeatherLayerRef.stopAnimation) activeWeatherLayerRef.stopAnimation();
+isAnimating = false;
+playPauseButton.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+if (animationInterval) clearInterval(animationInterval);
+if (activeWeatherLayerRef && activeWeatherLayerRef.stopAnimation) activeWeatherLayerRef.stopAnimation();
 }
 
 playPauseButton.onclick = () => isAnimating ? stopAnimation() : startAnimation();
 document.getElementById("menu-track-toggle").onclick = () => trackVisible ? removeTrackLayers() : addTrackLayers();
 document.querySelectorAll('#menu-panel [data-style]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const styleName = e.currentTarget.getAttribute('data-style');
-        let newStyle = maptilersdk.MapStyle.STREETS;
-        if(styleName === 'DARK_DATAVIZ') newStyle = maptilersdk.MapStyle.DATAVIZ.DARK;
-        if(styleName === 'SATELLITE') newStyle = maptilersdk.MapStyle.SATELLITE;
-        stopAnimation();
-        map.setStyle(newStyle);
-        document.querySelectorAll('#menu-panel [data-style]').forEach(b => b.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        map.once('style.load', () => {
-            if (trackVisible) { removeTrackLayers(); addTrackLayers(); }
-            clearWeatherLayers(); 
-            if (weatherLayerVisible) { weatherLayerVisible = false; toggleWeatherLayer(); }
-        });
-    });
+btn.addEventListener('click', (e) => {
+const styleName = e.currentTarget.getAttribute('data-style');
+let newStyle = maptilersdk.MapStyle.STREETS;
+if(styleName === 'DARK_DATAVIZ') newStyle = maptilersdk.MapStyle.DATAVIZ.DARK;
+if(styleName === 'SATELLITE') newStyle = maptilersdk.MapStyle.SATELLITE;
+stopAnimation();
+map.setStyle(newStyle);
+document.querySelectorAll('#menu-panel [data-style]').forEach(b => b.classList.remove('active'));
+e.currentTarget.classList.add('active');
+map.once('style.load', () => {
+if (trackVisible) { removeTrackLayers(); addTrackLayers(); }
+clearWeatherLayers();
+if (weatherLayerVisible) { weatherLayerVisible = false; toggleWeatherLayer(); }
+});
+});
 });
 
 async function loadAllIcons() {
-    const iconTypes = [{t:'PAST',n:'tc-icon-PAST'},{t:'CURRENT',n:'tc-icon-CURRENT'},{t:'T',n:'tc-icon-T'},{t:'S',n:'tc-icon-S'},{t:'L',n:'tc-icon-L'}];
-    for (const icon of iconTypes) {
-        const img = new Image(32, 32);
-        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(createIconSVG(icon.t, 32));
-        await new Promise(r => img.onload = r);
-        if (!map.hasImage(icon.n)) map.addImage(icon.n, img);
-    }
+const iconTypes = [{t:'PAST',n:'tc-icon-PAST'},{t:'CURRENT',n:'tc-icon-CURRENT'},{t:'T',n:'tc-icon-T'},{t:'S',n:'tc-icon-S'},{t:'L',n:'tc-icon-L'}];
+for (const icon of iconTypes) {
+const img = new Image(32, 32);
+img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(createIconSVG(icon.t, 32));
+await new Promise(r => img.onload = r);
+if (!map.hasImage(icon.n)) map.addImage(icon.n, img);
+}
 }
 
 map.on("load", async ()=>{
-    await loadAllIcons();
-    trackVisible = false; 
-    addTrackLayers();
-    populateLegend();
-    radarLayer = new maptilerweather.RadarLayer({opacity:0.4, id: 'radar-layer'});
-    map.addLayer(radarLayer, 'track-line');
-    document.getElementById("layer-radar").classList.add("active");
-    activeWeatherLayerRef = radarLayer;
-    updateWeatherLegend('Radar');
-    addPopupHandler();
+await loadAllIcons();
+trackVisible = false;
+addTrackLayers();
+populateLegend();
+radarLayer = new maptilerweather.RadarLayer({opacity:0.4, id: 'radar-layer'});
+map.addLayer(radarLayer, 'track-line');
+document.getElementById("layer-radar").classList.add("active");
+activeWeatherLayerRef = radarLayer;
+updateWeatherLegend('Radar');
+addPopupHandler();
 });
 </script>
 </body>
-  </html>
+</html>
